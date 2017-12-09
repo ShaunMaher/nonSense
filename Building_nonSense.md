@@ -22,7 +22,7 @@ I think I used the default settings all the way through the installation wizard.
 
 ### Useful and required packages
 ```
-pkg install sudo vim-lite tmux git
+pkg install sudo vim-lite tmux git bash
 ```
 
 ### Stop sendmail starting at boot because it takes too long and we don't need it
@@ -40,6 +40,8 @@ sendmail_submit_enable="NO"
 ## Download sources
 We're going to keep two copies of the source tree, one will be untouched, the
 other will get our modifications.  Then we can use `diff` to create a patch set.
+
+For the original upstream pfSense source:
 ```
 cd /var
 mkdir nonSense.orig
@@ -49,8 +51,18 @@ cd ..
 cp -a nonSense.orig nonSense
 ```
 
+For my pre-modified source:
+```
+cd /var
+mkdir nonSense.orig
+cd nonSense.orig
+git clone https://github.com/ShaunMaher/nonSense.git .
+cd ..
+cp -a nonSense.orig nonSense
+```
+
 ## NonSense: Missing parts
-Although the build system want's to create a product called nonSense by default,
+Although the build system wants to create a product called nonSense by default,
 it's still not really configured or coded properly to support this
 out-of-the-box (which is fair enough really).
 
@@ -59,7 +71,7 @@ nonSense*
 
 **Note:** If you are using the https://github.com/ShaunMaher/nonSense.git
 repository, all of these changes and fixes have already been made for you.  Skip
-ahead to the "Build" section.
+ahead to the "Create build.conf" section.
 
 ### Configuration files
 We need to copy/rename some pfSense files to nonSense.
@@ -81,17 +93,6 @@ ideal but we can circle back anbd find a better solution later.
 
 If we don't want to use the pfSense pkg repositories, we need to make changes to
 tools/build_defaults.sh to remove the pfSense/NetGate URL prefixes.
-
-### Create build.conf
-My build.conf file, with all the blank lines and comments removed looks like
-this:
-```
-export PRODUCT_NAME="nonSense"
-export PRODUCT_URL="https://PRODUCT_URL/"
-export PARENT_PRODUCT_NAME="pfSense"
-export PKG_REPO_SERVER_STAGING="pkg+http://pkg.pfsense.org/packages"
-export STAGING_HOSTNAME="pkg.pfsense.org"
-```
 
 ### Modify builder scripts very slightly
 I have created some modifications for the provided building scripts.  Some are
@@ -131,7 +132,20 @@ https://github.com/pfsense/FreeBSD-ports/blob/devel/security/pfSense/
 pfSense-builder is also in the ports collection:
 https://github.com/pfsense/FreeBSD-ports/tree/devel/sysutils/pfSense-builder/
 
+### Create build.conf
+You can either create a build.conf file based on build.conf.sample:
+```
+cp build.conf.sample build.conf
+```
+or use the build.conf.nonSense I have created for you:
+```
+ln -s build.conf.nonSense build.conf
+```
+
 ## Cross Compiling: TODO
+Supporting architectures that pfSense themselves don't support such as Arm or
+i386?  Are we mad?  Probably.
+
 TODO: TARGET and TARGET_ARCH are pulled from uname in tools/builder_defaults.sh
 Can we override in build.conf?  build.sh suggests so:
 ```
