@@ -203,7 +203,9 @@ if [ -z "${BUILTDATESTRING}" ]; then
 fi
 echo "$BUILTDATESTRING" > $BUILTDATESTRINGFILE
 
-STAGING_HOSTNAME=${STAGING_HOSTNAME:-"release-staging.netgate.com"}
+#SM: I haven't worked out how to apply this change in build.conf yet
+#STAGING_HOSTNAME=${STAGING_HOSTNAME:-"release-staging.netgate.com"}
+STAGING_HOSTNAME=${STAGING_HOSTNAME:-"pkg.pfsense.org"}
 
 # Poudriere
 export ZFS_TANK=${ZFS_TANK:-"zroot"}
@@ -333,7 +335,7 @@ export VARIANTUPDATES=""
 
 # Rsync data to send snapshots
 if [ -n "${_IS_RELEASE}" -o -n "${SKIP_FINAL_RSYNC}" ]; then
-	export RSYNCIP=${RSYNCIP:-"release-staging.netgate.com"}
+	export RSYNCIP=${RSYNCIP:-"xxx.netgate.com"}
 	export RSYNCUSER=${RSYNCUSER:-"wwwsync"}
 	export RSYNCPATH=${RSYNCPATH:-"/staging/ce/images"}
 else

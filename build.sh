@@ -360,7 +360,8 @@ if [ -z "${_SKIP_REBUILD_PRESTAGE}" ]; then
 	clone_to_staging_area
 
 	# Install packages needed for Product
-	install_pkg_install_ports
+	#SM: Hack, fix me properly
+	install_pkg_install_ports pfSense
 
 	# Create core repo
 	core_pkg_create_repo

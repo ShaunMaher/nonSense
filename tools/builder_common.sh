@@ -228,6 +228,22 @@ make_world() {
 		return
 	fi
 
+	echo ${FREEBSD_SRC_DIR}
+	if [ ! -e ${FREEBSD_SRC_DIR}/release/conf/${PRODUCT_NAME}_make.conf ]; then
+		if [ -e ${FREEBSD_SRC_DIR}/release/conf/${PARENT_PRODUCT_NAME}_make.conf ]; then
+			echo "Copying release/conf/${PARENT_PRODUCT_NAME}*.conf to ${FREEBSD_SRC_DIR}/release/conf/${PRODUCT_NAME}*.conf"
+			cp ${FREEBSD_SRC_DIR}/release/conf/${PARENT_PRODUCT_NAME}_make.conf ${FREEBSD_SRC_DIR}/release/conf/${PRODUCT_NAME}_make.conf
+			cp ${FREEBSD_SRC_DIR}/release/conf/${PARENT_PRODUCT_NAME}_src.conf ${FREEBSD_SRC_DIR}/release/conf/${PRODUCT_NAME}_src.conf
+			cp ${FREEBSD_SRC_DIR}/release/conf/${PARENT_PRODUCT_NAME}_src-env.conf ${FREEBSD_SRC_DIR}/release/conf/${PRODUCT_NAME}_src-env.conf
+		fi
+	fi
+	if [ ! -e ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PRODUCT_NAME} ]; then
+		if [ -e ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PARENT_PRODUCT_NAME} ]; then
+			echo "Copying sys/amd64/conf/${PARENT_PRODUCT_NAME} to ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PRODUCT_NAME}"
+			cp ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PARENT_PRODUCT_NAME} ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PRODUCT_NAME} 
+		fi
+	fi
+
 	echo ">>> $(LC_ALL=C date) - Starting build world for ${TARGET} architecture..." | tee -a ${LOGFILE}
 	script -aq $LOGFILE ${BUILDER_SCRIPTS}/build_freebsd.sh -K -s ${FREEBSD_SRC_DIR} \
 		|| print_error_pfS
@@ -963,6 +979,7 @@ create_memstick_adi_image() {
 # Create pkg conf on desired place with desired arch/branch
 setup_pkg_repo() {
 	if [ -z "${4}" ]; then
+		echo "4: ${4}"
 		return
 	fi
 
@@ -999,6 +1016,7 @@ setup_pkg_repo() {
 		-e "s,%%PKG_REPO_SERVER_RELEASE%%,${_pkg_repo_server_release},g" \
 		-e "s,%%POUDRIERE_PORTS_NAME%%,${POUDRIERE_PORTS_NAME},g" \
 		-e "s/%%PRODUCT_NAME%%/${PRODUCT_NAME}/g" \
+		-e "s/%%PARENT_PRODUCT_NAME%%/${PARENT_PRODUCT_NAME}/g" \
 		-e "s/%%REPO_BRANCH_PREFIX%%/${REPO_BRANCH_PREFIX}/g" \
 		${_template} \
 		> ${_target}
@@ -1007,8 +1025,16 @@ setup_pkg_repo() {
 # This routine ensures any ports / binaries that the builder
 # system needs are on disk and ready for execution.
 builder_setup() {
+	# If ${PRODUCT_NAME}-builder exists as a package, install it, otherwise install
+	# ${PARENT_PRODUCT_NAME}-builder
+	local _builder_name=${PRODUCT_NAME}
+	if ! pkg search -q ${_builder_name}-builder; then
+		_builder_name=${PARENT_PRODUCT_NAME:-"${PRODUCT_NAME}"}
+	fi
+	echo "$_builder_name"
+	
 	# If Product-builder is already installed, just leave
-	if pkg info -e -q ${PRODUCT_NAME}-builder; then
+	if pkg info -e -q ${_builder_name}-builder; then
 		return
 	fi
 
@@ -1031,7 +1057,7 @@ builder_setup() {
 			${PKG_REPO_PATH}
 	fi
 
-	pkg install ${PRODUCT_NAME}-builder
+	pkg install ${_builder_name}-builder
 }
 
 # Updates FreeBSD sources
