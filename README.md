@@ -1,3 +1,31 @@
+# nonSense
+
+## Overview
+
+This is not intended to be a fork of pfSense.  I love pfSense.  I just want to
+do some experiments with pfSense (that will likely fail) and in order to do so I
+need to be able to build it from source.
+
+The pfSense license allows us to build from it's source, we're just not allowed
+to call what we build "pfSense".  To facilitate this the pfSense build scripts
+want to call what they build "nonSense".  This complicates things a little
+because the builder is going to want to find files with "nonSense" in their
+names and download files with "nonSense" in the URLs.
+
+What I have here is the source pfSense 2.4.2 with some slight modifications so
+that it can actually build "nonSense".  I'll also document the changes made so
+that others can replicate (and improve) them.  See the file
+"Building_nonSense.md" for more information.
+
+You will not find nonSense or pfSense binaries or images here.  This is entirely
+for people that are interested in building pfSense from source for whatever
+reason.
+
+## Work in progress
+
+This is still a work in progress.  Hopefully I'll have a working modified source
+tree here soon but right now, the only change committed is this README file.
+
 # pfSense
 
 ## Overview
