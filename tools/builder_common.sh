@@ -243,6 +243,12 @@ make_world() {
 			cp ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PARENT_PRODUCT_NAME} ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PRODUCT_NAME} 
 		fi
 	fi
+	if [ ! -e ${FREEBSD_SRC_DIR}/sys/i386/conf/${PRODUCT_NAME} ]; then
+		if [ -e ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PARENT_PRODUCT_NAME} ]; then
+			echo "Copying sys/amd64/conf/${PARENT_PRODUCT_NAME} to ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PRODUCT_NAME}"
+			cp ${FREEBSD_SRC_DIR}/sys/amd64/conf/${PARENT_PRODUCT_NAME} ${FREEBSD_SRC_DIR}/sys/i386/conf/${PRODUCT_NAME}
+		fi
+	fi
 
 	echo ">>> $(LC_ALL=C date) - Starting build world for ${TARGET} architecture..." | tee -a ${LOGFILE}
 	script -aq $LOGFILE ${BUILDER_SCRIPTS}/build_freebsd.sh -K -s ${FREEBSD_SRC_DIR} \
